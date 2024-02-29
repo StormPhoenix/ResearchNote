@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-02-28T22:34
+updated: 2024-02-29T20:01
 tags:
   - Gameplay
   - AI
@@ -32,3 +32,13 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 2. [NavLink Proxy And Smart Links; UNREAL ENGINE - YouTube](https://www.youtube.com/watch?v=iu7cjp1Gg7U)
 
 最终采用方案二。项目中设计 NPC 的随机行为，用到了 UE 提供的 Smart Object 插件，需要在 NavLink Proxy 的基础上二次开发，将 NavLink Proxy 与 Smart Object 集成。
+
+## AI 攀爬动作
+
+应用场景与 AI 跳跃一样，不同的是 AI 需要采用攀爬动作到墙上。
+
+**让动画适配高度 - Motion Warping**
+
+参考：[UE5 Motion Warping翻越实践 - 知乎](https://zhuanlan.zhihu.com/p/466538055)
+
+

@@ -1,6 +1,6 @@
 ---
 created: 2023-11-29T11:22:00
-updated: 2024-02-27T01:38
+updated: 2024-02-29T19:10
 title: Camera - UE 中的相机设计及项目侧实践
 tags:
   - UnrealEngine
@@ -17,7 +17,7 @@ tags:
 * Camera View: 相机视角/摄像机/窗口，真正最终执行渲染的摄像机，即用户实际可见的窗口。大多数情况下由 Controller 决定其能渲染哪些东西。
 
 接下来对上述三点相机系统基本组成要素依次讨论。
-![[pic01.png]]
+![[pic01.png|500]]
 ## 控制器 (Controller)
 
 关于 controller，只需要关注其内部的 `ControlRotation` 成员。
@@ -30,15 +30,17 @@ class AController {
 
 `ControlRotation` 是一个旋转变量类型，他有两个作用:
 1. 控制相机的朝向。Camera View 应该渲染哪个方向的场景？这由 `ControlRotation` 决定。
-![[pic02.png]]
+
+![[pic02.png|500]]
 
 2. 控制角色的移动方向。角色可以前后左右移动，那么哪个方向是"前"方向呢？那就是`ControlRotation`，它将前后左右四个方向向量从局部坐标系转化到了世界坐标系空间。
-![[pic03.png]]
-## 角色 (Character)
+
+![[pic03.png|500]]
+## 角色 Character
 
 Character 是用户直观控制的角色，在 UE 的相机系统设计中，总是跟随着角色移动，角色的位置决定着相机的位置。
 
-## 相机视角 (Camera View)
+## 相机视角 Camera View
 Camera View 就是相机视角(可以理解为摄像机、渲染范围)，从上文可以得到结论，Controller 决定相机的拍摄朝向，Character 决定了相机位置。
 
 但上述结论只是一种简单概括，实际情况会复杂点。例如我们不希望相机的位置和 Character 相等，而是期望相机放在角色身后，也就是第三人称视角，这种情况下如何设计相机位置呢？
