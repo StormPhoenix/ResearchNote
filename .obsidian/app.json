@@ -1,0 +1,16 @@
+{
+  "livePreview": true,
+  "vimMode": true,
+  "attachmentFolderPath": "Attachments",
+  "userIgnoreFilters": [
+    "Assets/"
+  ],
+  "promptDelete": false,
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  }
+}

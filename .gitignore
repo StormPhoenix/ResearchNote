@@ -1,0 +1,14 @@
+node_modules
+.dendron.*
+build
+seeds
+.next
+pods/service-connections
+.idea/*
+**/.vscode/**
+**/.DS_Store
+**/.vscode/**
+
+.obsidian/icons/*
+.obsidian/plugins/*
+.obsidian/workspace*.json
