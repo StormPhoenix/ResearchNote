@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-02-29T20:01
+updated: 2024-03-04T17:30
 tags:
   - Gameplay
   - AI
@@ -42,3 +42,12 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 参考：[UE5 Motion Warping翻越实践 - 知乎](https://zhuanlan.zhihu.com/p/466538055)
 
 
+## AI 沿路径点平滑移动
+
+AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿下来，而是平滑的移动。此处涉及到两点，是移动平滑还是路径平滑？移动平滑是指严格沿着路径点折线移动，且移动不能停；路径平滑是指移动的路径是连续可导，这就要求不能是严格按照曲线移动。
+
+行为树上用到的 AI 移动节点调用的是 UAITask_MoveTo。UAITask_MoveTo 先用烘培好的 NavigationMesh 计算出折现路径，然后用 [[AI Navigation#PathFollowingComponent]] 组件实现 AI 的移动，而 PathFollowingComponent 内部将移动的方向、速度计算好后又是通过 MovementComponent 来移动的。  
+
+参考：
+[Make an Ai Follow a Spline in Unreal Engine 4 - YouTube](https://www.youtube.com/watch?v=UIF1PcmZkGA) 使用 Controller 的 MoveToLocation 使 AI 移动
+[Move Objects Over a Spline - UE4/UE5 Tutorial - YouTube](https://www.youtube.com/watch?v=HYFBmx6QRfs) 调用 SetActorLocation 和 SetActorRotation 强制移动 AI 的位姿
