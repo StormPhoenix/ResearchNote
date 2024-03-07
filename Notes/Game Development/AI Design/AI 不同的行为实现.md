@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-06T10:10
+updated: 2024-03-06T17:30
 tags:
   - Gameplay
   - AI
@@ -33,6 +33,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 
 最终采用方案二。项目中设计 NPC 的随机行为，用到了 UE 提供的 Smart Object 插件，需要在 NavLink Proxy 的基础上二次开发，将 NavLink Proxy 与 Smart Object 集成。
 
+---
 ## AI 攀爬动作
 
 应用场景与 AI 跳跃一样，不同的是 AI 需要采用攀爬动作到墙上。
@@ -41,7 +42,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 
 参考：[UE5 Motion Warping翻越实践 - 知乎](https://zhuanlan.zhihu.com/p/466538055)
 
-
+---
 ## AI 沿路径点平滑移动
 
 AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿下来，而是平滑的移动。此处涉及到两点，是移动平滑还是路径平滑？移动平滑是指严格沿着路径点折线移动，且移动不能停；路径平滑是指移动的路径是连续可导，这就要求不能是严格按照曲线移动。
@@ -57,10 +58,29 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 
 **方案三**
 
-自定义 AITask，内部多次调用 AITask_MoveTo。  
-
+自定义 AITask，内部多次调用 AITask_MoveTo。为了让 AI 移动时更加顺滑，需要调整 Ground Friction，让 AI 的速度计算符合加速度公式（避免 UE 中为了近似摩擦力效果的速度插值逻辑）。
+其次，要覆写 CharacterMovementComponent 中的旋转插值逻辑，让 AI 的旋转用当前速度方向而不是加速度方向来插值。
 
 
 参考：
 [Make an Ai Follow a Spline in Unreal Engine 4 - YouTube](https://www.youtube.com/watch?v=UIF1PcmZkGA) 使用 Controller 的 MoveToLocation 使 AI 移动
 [Move Objects Over a Spline - UE4/UE5 Tutorial - YouTube](https://www.youtube.com/watch?v=HYFBmx6QRfs) 调用 SetActorLocation 和 SetActorRotation 强制移动 AI 的位姿
+
+---
+## AI & Player 交互
+
+### AI 与 Player 打招呼
+
+打招呼行为是视觉上感知的结果，为 AI Controller 挂载 AIPerceptionComponent，为 AI 设置视觉感知监听。
+
+UE 提供了 AI Perception Component 和 AI Perception Stimuli Source Component 这套机制来提供视觉感知效果。
+### AI 遇到 Player 伤害行为逃离
+
+1. 伤害行为感知
+2. 逃离逻辑
+
+参考：
+1. [UE4源码-AI感知系统AIPerception（选摘） - 知乎](https://zhuanlan.zhihu.com/p/569297977)
+2. [UE4 关于AIPerception（一） - 知乎](https://zhuanlan.zhihu.com/p/463515204)
+3. [UE4 关于AIPerception（二） - 知乎](https://zhuanlan.zhihu.com/p/463525577)
+4. [Unreal Engine 5 Tutorial - AI Part 3: Perception System - YouTube](https://www.youtube.com/watch?v=bx7taRBjJgM)
