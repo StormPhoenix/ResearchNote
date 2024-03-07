@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-06T10:10
+updated: 2024-03-07T01:11
 tags:
   - Gameplay
   - AI
@@ -59,8 +59,12 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 
 自定义 AITask，内部多次调用 AITask_MoveTo。  
 
-
-
 参考：
 [Make an Ai Follow a Spline in Unreal Engine 4 - YouTube](https://www.youtube.com/watch?v=UIF1PcmZkGA) 使用 Controller 的 MoveToLocation 使 AI 移动
 [Move Objects Over a Spline - UE4/UE5 Tutorial - YouTube](https://www.youtube.com/watch?v=HYFBmx6QRfs) 调用 SetActorLocation 和 SetActorRotation 强制移动 AI 的位姿
+
+
+---
+AI Perception
+
+[UE4 AIPerception和AIPerceptionStimuliSource\_uaiperceptionstimulisourcecomponent-CSDN博客](https://blog.csdn.net/maxiaosheng521/article/details/103352122)  这篇文章提到：所有的 Pawn 都会被加上 AIScene_Sight，所以即使你不为 Pawn 配置 AI Perception Stimuli Source，它也会被感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 听觉、嗅觉等 -- 时才要加上 Stimuli Source。
