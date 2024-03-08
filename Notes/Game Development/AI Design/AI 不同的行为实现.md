@@ -1,11 +1,11 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-08T10:18
+updated: 2024-03-09T00:35
 tags:
   - Gameplay
   - AI
 ---
-## AI 跳跃动作
+# AI 跳跃动作
 
 AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停下来无法前景，典型的比如阶梯。此时需要 AI 执行跳跃动作后继续移动。
 
@@ -34,7 +34,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 最终采用方案二。项目中设计 NPC 的随机行为，用到了 UE 提供的 Smart Object 插件，需要在 NavLink Proxy 的基础上二次开发，将 NavLink Proxy 与 Smart Object 集成。
 
 ---
-## AI 攀爬动作
+# AI 攀爬动作
 
 应用场景与 AI 跳跃一样，不同的是 AI 需要采用攀爬动作到墙上。
 
@@ -43,7 +43,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 参考：[UE5 Motion Warping翻越实践 - 知乎](https://zhuanlan.zhihu.com/p/466538055)
 
 ---
-## AI 沿路径点平滑移动
+# AI 沿路径点平滑移动
 
 AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿下来，而是平滑的移动。此处涉及到两点，是移动平滑还是路径平滑？移动平滑是指严格沿着路径点折线移动，且移动不能停；路径平滑是指移动的路径是连续可导，这就要求不能是严格按照曲线移动。
 
@@ -61,35 +61,33 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 自定义 AITask，内部多次调用 AITask_MoveTo。为了让 AI 移动时更加顺滑，需要调整 Ground Friction，让 AI 的速度计算符合加速度公式（避免 UE 中为了近似摩擦力效果的速度插值逻辑）。
 其次，要覆写 CharacterMovementComponent 中的旋转插值逻辑，让 AI 的旋转用当前速度方向而不是加速度方向来插值。
 
-
 参考：
 [Make an Ai Follow a Spline in Unreal Engine 4 - YouTube](https://www.youtube.com/watch?v=UIF1PcmZkGA) 使用 Controller 的 MoveToLocation 使 AI 移动
 [Move Objects Over a Spline - UE4/UE5 Tutorial - YouTube](https://www.youtube.com/watch?v=HYFBmx6QRfs) 调用 SetActorLocation 和 SetActorRotation 强制移动 AI 的位姿
 
 ---
-## AI & Player 交互
+# AI  交互
+## AI Perception 组件
+### 立即上手
 
-### AI Perception 概览
+UE 官方文档提到为 AI 与刺激源分别配置 Perception 和 Stimulus 组件，但实际测试中发现，如果你为 Perception 组件添加的是视觉感知，那么所有的 Pawn 都会默认加上视觉刺激源。即使你不为 Pawn 配置 Sight Stimuli，它也会被 Perception 组件感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 例如听觉、嗅觉等 -- 时才要加上 Stimuli Source。
 
-UE 官方文档提到为 AI 与刺激源分别配置 Perception 和 Stimulus 组件，但实际测试中发现如果添加的是视觉感知，那么只需要配置 Perception，不用为 Pawn 配置 Situmulus 也能被 AI 感知到。
-
-[UE4 AIPerception和AIPerceptionStimuliSource\_uaiperceptionstimulisourcecomponent-CSDN博客](https://blog.csdn.net/maxiaosheng521/article/details/103352122)  
-这篇文章提到：所有的 Pawn 都会被加上 AIScene_Sight，所以即使你不为 Pawn 配置 AI Perception Stimuli Source，它也会被感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 听觉、嗅觉等 -- 时才要加上 Stimuli Source。
-
-#### OnTargetPerceptionUpdated
-
-要实现 AI 的感知行为，只要关注这个事件就好了，我们先来看看事件参数含义是什么。
+要让 AI 看到角色产生反应，只要编写 `OnTargetPerceptionUpdated` 事件就好了，Perception 组件会在感受到刺激源时调用这个事件。
 
 ![[AI 不同的行为实现-20240307.png]]
+- Stimulus Location: 被感知到的刺激源 Pawn 位置；
+- Receiver Location: 感知主体的位置；
+- Successfully Sensed: 当刺激源开始被感知为 true，脱离感知则为 false；
 
-- Stimulus Location: 被感知到的物体位置
-- Receiver Location: 感知主体的位置
-### AI 与 Player 打招呼
+### 源码解读
+
+
+## AI 与 Player 打招呼
 
 打招呼行为是视觉上感知的结果，为 AI Controller 挂载 AIPerceptionComponent，为 AI 设置视觉感知监听。
 
 UE 提供了 AI Perception Component 和 AI Perception Stimuli Source Component 这套机制来提供视觉感知效果。
-### AI 遇到 Player 伤害行为逃离
+## AI 遇到 Player 伤害行为逃离
 
 1. 伤害行为感知
 2. 逃离逻辑
