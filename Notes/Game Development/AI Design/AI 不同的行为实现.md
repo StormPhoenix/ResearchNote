@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-06T17:30
+updated: 2024-03-07T14:35
 tags:
   - Gameplay
   - AI
@@ -69,6 +69,16 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 ---
 ## AI & Player 交互
 
+### AI Perception 概览
+
+#### OnTargetPerceptionUpdated
+
+要实现 AI 的感知行为，只要关注这个事件就好了，我们先来看看事件参数含义是什么。
+
+![[AI 不同的行为实现-20240307.png]]
+
+- Stimulus Location: 被感知到的物体位置
+- Receiver Location: 感知主体的位置
 ### AI 与 Player 打招呼
 
 打招呼行为是视觉上感知的结果，为 AI Controller 挂载 AIPerceptionComponent，为 AI 设置视觉感知监听。
