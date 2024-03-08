@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-07T14:35
+updated: 2024-03-08T10:18
 tags:
   - Gameplay
   - AI
@@ -71,6 +71,11 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 
 ### AI Perception 概览
 
+UE 官方文档提到为 AI 与刺激源分别配置 Perception 和 Stimulus 组件，但实际测试中发现如果添加的是视觉感知，那么只需要配置 Perception，不用为 Pawn 配置 Situmulus 也能被 AI 感知到。
+
+[UE4 AIPerception和AIPerceptionStimuliSource\_uaiperceptionstimulisourcecomponent-CSDN博客](https://blog.csdn.net/maxiaosheng521/article/details/103352122)  
+这篇文章提到：所有的 Pawn 都会被加上 AIScene_Sight，所以即使你不为 Pawn 配置 AI Perception Stimuli Source，它也会被感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 听觉、嗅觉等 -- 时才要加上 Stimuli Source。
+
 #### OnTargetPerceptionUpdated
 
 要实现 AI 的感知行为，只要关注这个事件就好了，我们先来看看事件参数含义是什么。
@@ -94,5 +99,3 @@ UE 提供了 AI Perception Component 和 AI Perception Stimuli Source Component 
 2. [UE4 关于AIPerception（一） - 知乎](https://zhuanlan.zhihu.com/p/463515204)
 3. [UE4 关于AIPerception（二） - 知乎](https://zhuanlan.zhihu.com/p/463525577)
 4. [Unreal Engine 5 Tutorial - AI Part 3: Perception System - YouTube](https://www.youtube.com/watch?v=bx7taRBjJgM)
-[UE4 AIPerception和AIPerceptionStimuliSource\_uaiperceptionstimulisourcecomponent-CSDN博客](https://blog.csdn.net/maxiaosheng521/article/details/103352122)  这篇文章提到：所有的 Pawn 都会被加上 AIScene_Sight，所以即使你不为 Pawn 配置 AI Perception Stimuli Source，它也会被感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 听觉、嗅觉等 -- 时才要加上 Stimuli Source。
-
