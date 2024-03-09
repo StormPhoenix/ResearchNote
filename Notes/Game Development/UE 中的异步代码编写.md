@@ -1,6 +1,6 @@
 ---
 created: 2024-03-05T16:58
-updated: 2024-03-05T20:15
+updated: 2024-03-09T04:02
 ---
 异步任务的实质是：<mark style="background: #FFB86CA6;">利用回调函数的编程技法，将需要一段时间才能执行完的代码抽象成一个 Task 实例</mark>。举个例子，存在某个 Task 包含 Activate() 和 Deactivate() 函数，Activate() 用于触发我们要执行的任务代码，Deactivate() 函数用于处理当任务结束的后处理，那么需要利用回调编程技法，让任务代码在执行完的时候去执行 Deactivate()。
 
