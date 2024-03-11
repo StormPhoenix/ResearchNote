@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-08T10:18
+updated: 2024-03-08T14:30
 tags:
   - Gameplay
   - AI
@@ -9,7 +9,7 @@ tags:
 
 AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停下来无法前景，典型的比如阶梯。此时需要 AI 执行跳跃动作后继续移动。
 
-![[Pasted image 20240226195215.png]]
+![[Pasted image 20240226195215.png|525]]
 
 **方案一**
 
@@ -21,7 +21,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 
 调用 `Character::LaunchCharacter()` 函数，设定好速度 v，将 Character 以速度 v 按弧形的方向发射出去。
 
-![[Pasted image 20240226204010.png]]
+![[Pasted image 20240226204010.png|575]]
 
 该方案用到了 Navlink Proxy 来连接两个分割的 NavMesh。当 AI 要跨 NavMesh 移动时，会尝试从 Navlink Proxy 的起点移动到终点，但默认情况下 Navlink Proxy 并没有告诉 AI 要如何移动，所以遇到有高度的墙壁时 AI 会堵死。
 
@@ -80,10 +80,46 @@ UE 官方文档提到为 AI 与刺激源分别配置 Perception 和 Stimulus 组
 
 要实现 AI 的感知行为，只要关注这个事件就好了，我们先来看看事件参数含义是什么。
 
-![[AI 不同的行为实现-20240307.png]]
+![[AI 不同的行为实现-20240307.png|500]]
 
 - Stimulus Location: 被感知到的物体位置
 - Receiver Location: 感知主体的位置
+
+### 如何打断行为树
+
+引擎自带的 Task 节点 --- Wait、MoveTo --- 是可以随着行为树的打断而中断的，我们来看看原理是什么？
+
+#### 行为树节点 UBT Task 的中断逻辑 - Abort Task
+
+BTTask_BlueprintBase::AbortTask：执行中断逻辑，取消所有在 LatentActionManager 中注册的延迟行为，其次执行用户自定义的 Abort 行为。
+~~~cpp
+EBTNodeResult::Type UBTTask_BlueprintBase::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)  
+{  
+	// 取消注册的延迟执行函数
+	BlueprintNodeHelpers::AbortLatentActions(OwnerComp, *this);
+	// ... ...
+	// 执行中断逻辑
+    ReceiveAbortAI(AIOwner, AIOwner->GetPawn());  
+}
+~~~
+
+BTTask_BlueprintBase::AbortTask 是从 UBTTaskNode 基类继承而来的，这个基类里啥逻辑都没有，完全依赖子类实现 AbortTask
+
+#### 行为树 UBehaviorTreeComponent 的中断逻辑 - AbortCurrentTask
+
+Behavior Tree Component 每帧 Tick 搜索可执行的 Task，如果能搜索到则调用 AbortCurrentTask() 中断当前 Task。
+
+AbortCurrentTask 内部简介调用 UBT Task 的 AbortTask 来完成中断。
+
+对比了 GameplayTask 和 UBTNode，两者都实现了 IGameplayTaskOwnerInterface，但只有 UBTNode 的子类 BTTaskNode 提供了中断接口，这说明中断行为不是默认提供的，用户要自己编辑逻辑实现中断。
+
+例如，如果用户在自定义的 BT Task 内调用了 GameplayTask，那么需要在 BT Task Abort 时主动取消 GameplayTask，不然中断后 Gameplay Task 会一直执行。
+
+参考：
+1. [UE4 ActionGame知识点总结1-FLatentActionInfo以及FLatentActionManager使用-CSDN博客](https://blog.csdn.net/hui211314ddhui/article/details/80710229)
+2. [UE4 浅谈FLatentActionManager - 知乎](https://zhuanlan.zhihu.com/p/675932469)
+3. [UE代码-游戏AI-行为树执行流程（待更新） - ccsu\_madoka - 博客园](https://www.cnblogs.com/whitelily/p/17100961.html)
+
 ### AI 与 Player 打招呼
 
 打招呼行为是视觉上感知的结果，为 AI Controller 挂载 AIPerceptionComponent，为 AI 设置视觉感知监听。
