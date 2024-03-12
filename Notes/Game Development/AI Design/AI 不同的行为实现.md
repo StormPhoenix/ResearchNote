@@ -1,6 +1,6 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-08T14:30
+updated: 2024-03-11T11:13
 tags:
   - Gameplay
   - AI
@@ -47,7 +47,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 
 AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿下来，而是平滑的移动。此处涉及到两点，是移动平滑还是路径平滑？移动平滑是指严格沿着路径点折线移动，且移动不能停；路径平滑是指移动的路径是连续可导，这就要求不能是严格按照曲线移动。
 
-行为树上用到的 AI 移动节点调用的是 UAITask_MoveTo。UAITask_MoveTo 先用烘培好的 NavigationMesh 计算出折现路径，然后用 [[AI Navigation#PathFollowingComponent]] 组件实现 AI 的移动，而 PathFollowingComponent 内部将移动的方向、速度计算好后又是通过 MovementComponent 来移动的。
+行为树上用到的 AI 移动节点调用的是 UAITask_MoveTo。UAITask_MoveTo 先用烘培好的 NavigationMesh 计算出折现路径，然后用 [[AI 原理解读#PathFollowingComponent]] 组件实现 AI 的移动，而 PathFollowingComponent 内部将移动的方向、速度计算好后又是通过 MovementComponent 来移动的。
 **方案一**
 
 使用 Splineline，设置 AI 的 Location / Rotation
@@ -127,11 +127,18 @@ AbortCurrentTask 内部简介调用 UBT Task 的 AbortTask 来完成中断。
 UE 提供了 AI Perception Component 和 AI Perception Stimuli Source Component 这套机制来提供视觉感知效果。
 ### AI 遇到 Player 伤害行为逃离
 
-1. 伤害行为感知
-2. 逃离逻辑
+AI 伤害感知：UAIScene_Damage::ReportDamageEvent 是一个静态函数，伤害刺激源需要用户主动调用该函数，触发伤害事件广播，配置步骤如下：
+1. Perception 组件要配置 AI Damage Scene Config
+2. 刺激源调用 ReportDamageEvent，触发 Perception 组件更新
+3. Perception 组件触发 OnPerceptionUpdated 事件，参考 [这个教程](https://www.youtube.com/watch?v=g8rz7aZyDMs)，在事件中使用了 GetActorsPerception 函数，遍历所有 UAIScene 来修改行为树参数，值得参考。
+	![[AI 不同的行为实现-20240311.png|600]]
+
+AI 逃离行为
+
 
 参考：
 1. [UE4源码-AI感知系统AIPerception（选摘） - 知乎](https://zhuanlan.zhihu.com/p/569297977)
 2. [UE4 关于AIPerception（一） - 知乎](https://zhuanlan.zhihu.com/p/463515204)
 3. [UE4 关于AIPerception（二） - 知乎](https://zhuanlan.zhihu.com/p/463525577)
 4. [Unreal Engine 5 Tutorial - AI Part 3: Perception System - YouTube](https://www.youtube.com/watch?v=bx7taRBjJgM)
+5. [Unreal Engine 4 Tutorial - AI - Part 11 Damage Sensing - YouTube](https://www.youtube.com/watch?v=g8rz7aZyDMs)
