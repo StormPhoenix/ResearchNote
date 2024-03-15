@@ -1,15 +1,15 @@
 ---
 created: 2024-02-26T21:29
-updated: 2024-03-11T11:13
+updated: 2024-03-09T00:35
 tags:
   - Gameplay
   - AI
 ---
-## AI 跳跃动作
+# AI 跳跃动作
 
 AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停下来无法前景，典型的比如阶梯。此时需要 AI 执行跳跃动作后继续移动。
 
-![[Pasted image 20240226195215.png|525]]
+![[Pasted image 20240226195215.png]]
 
 **方案一**
 
@@ -21,7 +21,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 
 调用 `Character::LaunchCharacter()` 函数，设定好速度 v，将 Character 以速度 v 按弧形的方向发射出去。
 
-![[Pasted image 20240226204010.png|575]]
+![[Pasted image 20240226204010.png]]
 
 该方案用到了 Navlink Proxy 来连接两个分割的 NavMesh。当 AI 要跨 NavMesh 移动时，会尝试从 Navlink Proxy 的起点移动到终点，但默认情况下 Navlink Proxy 并没有告诉 AI 要如何移动，所以遇到有高度的墙壁时 AI 会堵死。
 
@@ -34,7 +34,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 最终采用方案二。项目中设计 NPC 的随机行为，用到了 UE 提供的 Smart Object 插件，需要在 NavLink Proxy 的基础上二次开发，将 NavLink Proxy 与 Smart Object 集成。
 
 ---
-## AI 攀爬动作
+# AI 攀爬动作
 
 应用场景与 AI 跳跃一样，不同的是 AI 需要采用攀爬动作到墙上。
 
@@ -43,7 +43,7 @@ AI 在 Navmesh 上移动时，如果遇到高度方向的阻挡，AI 就会停�
 参考：[UE5 Motion Warping翻越实践 - 知乎](https://zhuanlan.zhihu.com/p/466538055)
 
 ---
-## AI 沿路径点平滑移动
+# AI 沿路径点平滑移动
 
 AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿下来，而是平滑的移动。此处涉及到两点，是移动平滑还是路径平滑？移动平滑是指严格沿着路径点折线移动，且移动不能停；路径平滑是指移动的路径是连续可导，这就要求不能是严格按照曲线移动。
 
@@ -71,12 +71,14 @@ AI 在沿着路径点移动时，要求在经过路径点的时候不要停顿�
 
 ### AI Perception 概览
 
-UE 官方文档提到为 AI 与刺激源分别配置 Perception 和 Stimulus 组件，但实际测试中发现如果添加的是视觉感知，那么只需要配置 Perception，不用为 Pawn 配置 Situmulus 也能被 AI 感知到。
+要让 AI 看到角色产生反应，只要编写 `OnTargetPerceptionUpdated` 事件就好了，Perception 组件会在感受到刺激源时调用这个事件。
 
-[UE4 AIPerception和AIPerceptionStimuliSource\_uaiperceptionstimulisourcecomponent-CSDN博客](https://blog.csdn.net/maxiaosheng521/article/details/103352122)  
-这篇文章提到：所有的 Pawn 都会被加上 AIScene_Sight，所以即使你不为 Pawn 配置 AI Perception Stimuli Source，它也会被感知到。只有当需要使用除 Sight 以外的其它感知系统 -- 听觉、嗅觉等 -- 时才要加上 Stimuli Source。
+![[AI 不同的行为实现-20240307.png]]
+- Stimulus Location: 被感知到的刺激源 Pawn 位置；
+- Receiver Location: 感知主体的位置；
+- Successfully Sensed: 当刺激源开始被感知为 true，脱离感知则为 false；
 
-#### OnTargetPerceptionUpdated
+### 源码解读
 
 要实现 AI 的感知行为，只要关注这个事件就好了，我们先来看看事件参数含义是什么。
 
@@ -125,7 +127,7 @@ AbortCurrentTask 内部简介调用 UBT Task 的 AbortTask 来完成中断。
 打招呼行为是视觉上感知的结果，为 AI Controller 挂载 AIPerceptionComponent，为 AI 设置视觉感知监听。
 
 UE 提供了 AI Perception Component 和 AI Perception Stimuli Source Component 这套机制来提供视觉感知效果。
-### AI 遇到 Player 伤害行为逃离
+## AI 遇到 Player 伤害行为逃离
 
 AI 伤害感知：UAIScene_Damage::ReportDamageEvent 是一个静态函数，伤害刺激源需要用户主动调用该函数，触发伤害事件广播，配置步骤如下：
 1. Perception 组件要配置 AI Damage Scene Config
@@ -141,4 +143,3 @@ AI 逃离行为
 2. [UE4 关于AIPerception（一） - 知乎](https://zhuanlan.zhihu.com/p/463515204)
 3. [UE4 关于AIPerception（二） - 知乎](https://zhuanlan.zhihu.com/p/463525577)
 4. [Unreal Engine 5 Tutorial - AI Part 3: Perception System - YouTube](https://www.youtube.com/watch?v=bx7taRBjJgM)
-5. [Unreal Engine 4 Tutorial - AI - Part 11 Damage Sensing - YouTube](https://www.youtube.com/watch?v=g8rz7aZyDMs)
